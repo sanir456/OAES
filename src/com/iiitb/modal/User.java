@@ -100,29 +100,49 @@ public class User {
         System.out.println("3. Back");
         System.out.print("Choose option: ");
     }
+    public void printSubMenu2(){
+        System.out.println("Menu: ");
+        System.out.println("1. Update test pattern and generate question paper set");
+        System.out.println("2. Only generate question paper test");
+        System.out.print("Choose option: ");
+    }
 
-    public void generatePaperSet(Statement stmt, ResultSet rs, String query,int courseId ,Scanner sc) throws SQLException{
+    public JSONObject getTestPattern(Statement stmt, ResultSet rs, String query,int courseId ) throws SQLException {
         query = "SELECT * FROM coursemaster WHERE courseId = "+courseId;
         rs = stmt.executeQuery(query);
         CourseMaster cm = CourseMaster.rsToObject(rs);
+        return cm.getTestPattern();
+    }
+
+    public List<Item> getQuestion(Statement stmt, ResultSet rs, String query,int courseId ,JSONObject testPattern,int sectionNumber) throws SQLException {
+        JSONObject sectionInfo = testPattern.getJSONObject(Integer.toString(sectionNumber));
+        query = "SELECT * FROM itembank where courseId = "+courseId+" and itemCategory = \"" + sectionInfo.getString("questionType") + "\" ORDER BY RAND() LIMIT " + sectionInfo.getInt("numberOfQuestion");
+        rs = stmt.executeQuery(query);
+        return Item.rsToObject(rs);
+    }
+
+    public void updateTestPatternStyle(Statement stmt,String query,int courseId,String testPatternString) throws SQLException {
+        query ="UPDATE coursemaster SET courseTestPattern = " + testPatternString + " WHERE courseId = " + courseId;
+        stmt.executeUpdate(query);
+        System.out.println("Update Successfully");
+    }
+
+    public void generatePaperSet(Statement stmt, ResultSet rs, String query,int courseId ,JSONObject testPattern,Scanner sc) throws SQLException{
         System.out.print("How many question paper do you want to generate: ");
         int setCount = sc.nextInt();
-        QuestionPaperSet questionPaperSet = new QuestionPaperSet(setCount,cm.getTestPattern().getInt("numberOfSection"));
+        QuestionPaperSet questionPaperSet = new QuestionPaperSet(setCount,testPattern.getInt("numberOfSection"));
         for(int i=0;i<setCount;i++)
         {
             List<Section> paper = new ArrayList<>();
             for(int j=0;j<questionPaperSet.getNumberOfSection();j++)
             {
                 Section section = new Section();
-                JSONObject sectionInfo = cm.getTestPattern().getJSONObject(Integer.toString(j+1));
-                section.setTotalMarks(sectionInfo.getInt("totalMarks"));
+                JSONObject sectionInfo = testPattern.getJSONObject(Integer.toString(j+1));
+                section.setTotalMarks(sectionInfo.getInt("sectionMarks"));
                 section.setNumberOfQuestion(sectionInfo.getInt("numberOfQuestion"));
                 section.setQuestionType(sectionInfo.getString("questionType"));
                 section.setNumberOfQuestionAttempt(sectionInfo.getInt("numberOfQuestionAttempt"));
-                query = "SELECT * FROM itembank where courseId = "+courseId+" and itemCategory = \"" + section.getQuestionType() + "\" ORDER BY RAND() LIMIT " + section.getNumberOfQuestion();
-//                                    System.out.println(query);
-                rs = stmt.executeQuery(query);
-                section.setQuestions(Item.rsToObject(rs));
+                section.setQuestions(this.getQuestion(stmt,rs,query,courseId,testPattern,j+1));
                 paper.add(section);
             }
             questionPaperSet.getPapers().add(paper);

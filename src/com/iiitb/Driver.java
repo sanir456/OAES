@@ -21,6 +21,7 @@ public class Driver {
         ResultSet rs=null;
         User admin;
         try {
+            System.out.format("%15s\n","Welcome Online Assessment and Evolution System (OAES)");
             while(true){
                 System.out.print("Enter User Name: ");
                 String userName = sc.nextLine();
@@ -31,11 +32,11 @@ public class Driver {
                 rs = stmt.executeQuery(query);
                 admin = User.rsToObject(rs);
                 if(admin.getUserPassword().equals(password)){
-                    System.out.println("Sucessfully login!!");
+                    System.out.format("\n%15s\n","Sucessfully login!!");
                     break;
                 }
                 else {
-                    System.out.println("wrong credentials!!");
+                    System.out.format("\n%15s\n","wrong credentials!!");
                 }
 
             }
@@ -53,11 +54,60 @@ public class Driver {
                             option = sc.nextInt();
                             switch (option){
                                 case 1:{
-                                    admin.generatePaperSet(stmt,rs,query,courseId,sc);
+                                    JSONObject testPattern = admin.getTestPattern(stmt,rs,query,courseId);
+                                    admin.generatePaperSet(stmt,rs,query,courseId,testPattern,sc);
                                     break;
                                 }
                                 case 2:{
-                                  break;
+                                    String testPatternString = "{";
+                                    System.out.print("Number of section: ");
+                                    sc=new Scanner(System.in);
+                                    String numberOfSection = sc.nextLine();
+                                    testPatternString += "\"numberOfSection\":\""+numberOfSection+"\"";
+
+                                    System.out.print("Total marks: ");
+                                    String totalMarks = sc.nextLine();
+                                    testPatternString += ",\"totalmarks\":\""+totalMarks+"\"";
+
+                                    for(int i=1;i<=Integer.valueOf(numberOfSection);i++)
+                                    {
+                                        System.out.println("Enter detail about section "+i+":");
+                                        String sectionInfo = ",\""+Integer.toString(i)+"\":{";
+                                        System.out.print("Section marks:");
+                                        String sectionMarks = sc.nextLine();
+                                        sectionInfo+="\"sectionMarks\":\""+sectionMarks+"\"";
+
+                                        System.out.print("Question Type: ");
+                                        String questionType = sc.nextLine();
+                                        sectionInfo+=",\"questionType\":\""+questionType+"\"";
+
+                                        System.out.print("Number of Question:");
+                                        String numberOfQuestion = sc.nextLine();
+                                        sectionInfo+=",\"numberOfQuestion\":\""+numberOfQuestion+"\"";
+
+                                        System.out.print("Number of question attempt: ");
+                                        String numberOfQuestionAttempt = sc.nextLine();
+                                        sectionInfo+=",\"numberOfQuestionAttempt\":\""+numberOfQuestionAttempt+"\"}";
+                                        testPatternString += sectionInfo;
+
+                                    }
+                                    testPatternString+="}";
+                                    JSONObject testPattern = new JSONObject(testPatternString);
+                                    admin.printSubMenu2();
+                                    option = sc.nextInt();
+                                    switch (option){
+                                        case 1:{
+                                            admin.updateTestPatternStyle(stmt,query,courseId,testPatternString);
+                                            admin.generatePaperSet(stmt,rs,query,courseId,testPattern,sc);
+                                            break;
+                                        }
+                                        case 2:{
+                                            admin.generatePaperSet(stmt,rs,query,courseId,testPattern,sc);
+                                            break;
+                                        }
+                                    }
+
+                                    break;
                                 }
                                 case 3:{
                                     isBreak = true;
