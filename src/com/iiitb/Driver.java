@@ -72,7 +72,7 @@ public class Driver {
 
                                     System.out.print("Total marks: ");
                                     String totalMarks = sc.nextLine();
-                                    testPatternString += ",\"totalmarks\":\""+totalMarks+"\"";
+                                    testPatternString += ",\"totalMarks\":\""+totalMarks+"\"";
 
                                     for(int i=1;i<=Integer.valueOf(numberOfSection);i++)
                                     {
@@ -129,6 +129,11 @@ public class Driver {
                         break;
                     }
                     case 2: {
+                        admin.printInvalidQuestionPaperSetList(stmt,rs,query);
+                        int setId = sc.nextInt();
+                        break;
+                    }
+                    case 3: {
                         JDBCconnectorUtil.closeConnection();
                         isLogout = true;
                         break;
