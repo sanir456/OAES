@@ -11,17 +11,16 @@ public class CourseMaster {
     private String courseName;
     private String courseDescription;
     private JSONObject testPattern;
-    private String itemCategories;
 
     public CourseMaster() {
     }
 
-    public CourseMaster(int courseId, String courseName, String courseDescription, JSONObject testPattern, String itemCategories) {
+    public CourseMaster(int courseId, String courseName, String courseDescription, JSONObject testPattern) {
         this.courseId = courseId;
         this.courseName = courseName;
         this.courseDescription = courseDescription;
         this.testPattern = testPattern;
-        this.itemCategories = itemCategories;
+
     }
 
     public int getCourseId() {
@@ -56,13 +55,7 @@ public class CourseMaster {
         this.testPattern = testPattern;
     }
 
-    public String getItemCategories() {
-        return itemCategories;
-    }
 
-    public void setItemCategories(String itemCategories) {
-        this.itemCategories = itemCategories;
-    }
 
     static public CourseMaster rsToObject(ResultSet rs)
     {
@@ -73,11 +66,11 @@ public class CourseMaster {
                 cm.setCourseName(rs.getString("courseName"));
                 cm.setCourseDescription(rs.getString("courseDescription"));
                 cm.setTestPattern( new JSONObject( rs.getString("courseTestPattern")));
-                cm.setItemCategories(rs.getString("itemCategories"));
+
             }
         }
         catch (Exception e){
-            e.printStackTrace();
+            e.getMessage();
         }
         return cm;
     }

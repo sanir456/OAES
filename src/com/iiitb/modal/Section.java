@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Section {
-    private int totalMarks;
+    private int sectionMarks;
     private int numberOfQuestion;
     private String questionType;
     private int numberOfQuestionAttempt;
@@ -13,20 +13,20 @@ public class Section {
     public Section() {
     }
 
-    public Section(int totalMarks, int numberOfQuestion, String questionType, int numberOfQuestionAttempt, List<Item> questions) {
-        this.totalMarks = totalMarks;
+    public Section(int sectionMarks, int numberOfQuestion, String questionType, int numberOfQuestionAttempt, List<Item> questions) {
+        this.sectionMarks = sectionMarks;
         this.numberOfQuestion = numberOfQuestion;
         this.questionType = questionType;
         this.numberOfQuestionAttempt = numberOfQuestionAttempt;
         this.questions = questions;
     }
 
-    public int getTotalMarks() {
-        return totalMarks;
+    public int getSectionMarks() {
+        return sectionMarks;
     }
 
-    public void setTotalMarks(int totalMarks) {
-        this.totalMarks = totalMarks;
+    public void setSectionMarks(int sectionMarks) {
+        this.sectionMarks = sectionMarks;
     }
 
     public int getNumberOfQuestion() {
@@ -64,7 +64,7 @@ public class Section {
     @Override
     public String toString() {
         return "Section{" +
-                "totalMarks=" + totalMarks +
+                "sectionMarks=" + sectionMarks +
                 ", numberOfQuestion=" + numberOfQuestion +
                 ", questionType='" + questionType + '\'' +
                 ", numberOfQuestionAttempt=" + numberOfQuestionAttempt +

@@ -21,7 +21,7 @@ public class Driver {
         ResultSet rs=null;
         User admin;
         try {
-            System.out.format("%15s\n","Welcome Online Assessment and Evolution System (OAES)");
+            System.out.println("\t\tWelcome Online Assessment and Evolution System (OAES)");
             while(true){
                 System.out.print("Enter User Name: ");
                 String userName = sc.nextLine();
@@ -31,12 +31,12 @@ public class Driver {
 
                 rs = stmt.executeQuery(query);
                 admin = User.rsToObject(rs);
-                if(admin.getUserPassword().equals(password)){
-                    System.out.format("\n%15s\n","Sucessfully login!!");
+                if(admin!=null && admin.getUserPassword().equals(password)){
+                    System.out.println("\tSucessfully login!!");
                     break;
                 }
                 else {
-                    System.out.format("\n%15s\n","wrong credentials!!");
+                    System.out.println("\twrong credentials!!");
                 }
 
             }
@@ -55,6 +55,11 @@ public class Driver {
                             switch (option){
                                 case 1:{
                                     JSONObject testPattern = admin.getTestPattern(stmt,rs,query,courseId);
+                                    if(testPattern == null)
+                                    {
+                                        System.out.println("Test Pattern is not defined");
+                                        break;
+                                    }
                                     admin.generatePaperSet(stmt,rs,query,courseId,testPattern,sc);
                                     break;
                                 }
@@ -97,7 +102,7 @@ public class Driver {
                                     option = sc.nextInt();
                                     switch (option){
                                         case 1:{
-                                            admin.updateTestPatternStyle(stmt,query,courseId,testPatternString);
+                                            admin.updateTestPatternStyle(stmt,query,courseId,testPattern);
                                             admin.generatePaperSet(stmt,rs,query,courseId,testPattern,sc);
                                             break;
                                         }

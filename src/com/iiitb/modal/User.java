@@ -60,9 +60,10 @@ public class User {
 
     static public User rsToObject(ResultSet rs)
     {
-        User user = new User();;
+        User user = null;
         try{
             if(rs.next()) {
+                user=new User();
                 user.setUserId(rs.getInt("userId"));
                 user.setUserType(rs.getString("userType"));
                 user.setUserName(rs.getString("userName"));
@@ -121,8 +122,9 @@ public class User {
         return Item.rsToObject(rs);
     }
 
-    public void updateTestPatternStyle(Statement stmt,String query,int courseId,String testPatternString) throws SQLException {
-        query ="UPDATE coursemaster SET courseTestPattern = " + testPatternString + " WHERE courseId = " + courseId;
+    public void updateTestPatternStyle(Statement stmt,String query,int courseId,JSONObject testPattern) throws SQLException {
+        query ="UPDATE coursemaster SET courseTestPattern = \'" + testPattern.toString() + "\' WHERE courseId = " + courseId;
+        System.out.println(query);
         stmt.executeUpdate(query);
         System.out.println("Update Successfully");
     }
@@ -130,7 +132,7 @@ public class User {
     public void generatePaperSet(Statement stmt, ResultSet rs, String query,int courseId ,JSONObject testPattern,Scanner sc) throws SQLException{
         System.out.print("How many question paper do you want to generate: ");
         int setCount = sc.nextInt();
-        QuestionPaperSet questionPaperSet = new QuestionPaperSet(setCount,testPattern.getInt("numberOfSection"));
+        QuestionPaperSet questionPaperSet = new QuestionPaperSet(setCount,testPattern.getInt("numberOfSection"),testPattern.getInt("totalMarks"));
         for(int i=0;i<setCount;i++)
         {
             List<Section> paper = new ArrayList<>();
@@ -138,7 +140,7 @@ public class User {
             {
                 Section section = new Section();
                 JSONObject sectionInfo = testPattern.getJSONObject(Integer.toString(j+1));
-                section.setTotalMarks(sectionInfo.getInt("sectionMarks"));
+                section.setSectionMarks(sectionInfo.getInt("sectionMarks"));
                 section.setNumberOfQuestion(sectionInfo.getInt("numberOfQuestion"));
                 section.setQuestionType(sectionInfo.getString("questionType"));
                 section.setNumberOfQuestionAttempt(sectionInfo.getInt("numberOfQuestionAttempt"));
@@ -148,6 +150,7 @@ public class User {
             questionPaperSet.getPapers().add(paper);
         }
         questionPaperSet.printQuestionPapers();
+
     }
 
 }
