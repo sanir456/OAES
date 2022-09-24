@@ -131,6 +131,11 @@ public class Driver {
                     case 2: {
                         admin.printInvalidQuestionPaperSetList(stmt,rs,query);
                         int setId = sc.nextInt();
+                        admin.getQuestionpaperSet(stmt,rs,query,setId);
+                        System.out.println("Validate Question Paper set:(yes/no)?");
+                        sc = new Scanner(System.in);
+                        String response = sc.nextLine();
+                        System.out.println("Successfully Validate");
                         break;
                     }
                     case 3: {

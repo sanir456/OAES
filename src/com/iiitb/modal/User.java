@@ -128,12 +128,6 @@ public class User {
         return cm.getTestPattern();
     }
 
-    public List<Item> getQuestion(Statement stmt, ResultSet rs, String query,int courseId ,JSONObject testPattern,int sectionNumber) throws SQLException {
-        JSONObject sectionInfo = testPattern.getJSONObject(Integer.toString(sectionNumber));
-        query = "SELECT * FROM itembank where courseId = "+courseId+" and itemCategory = \"" + sectionInfo.getString("questionType") + "\" ORDER BY RAND() LIMIT " + sectionInfo.getInt("numberOfQuestion");
-        rs = stmt.executeQuery(query);
-        return Item.rsToObject(rs);
-    }
 
     public void updateTestPatternStyle(Statement stmt,String query,int courseId,JSONObject testPattern) throws SQLException {
         query ="UPDATE coursemaster SET courseTestPattern = \'" + testPattern.toString() + "\' WHERE courseId = " + courseId;
@@ -150,61 +144,30 @@ public class User {
         String paperSetString = "{";
         for(int i=0;i<setCount;i++)
         {
-            List<Section> paper = new ArrayList<>();
             if(i!=0)
             {
                 paperSetString+=",";
             }
             paperSetString += "\""+Integer.toString(i+1)+"\":{";
-            for(int j=0;j<questionPaperSet.getNumberOfSection();j++)
-            {
-                if(j!=0)
-                {
-                    paperSetString+=",";
-                }
-                paperSetString += "\""+Integer.toString(j+1)+"\":{";
-                Section section = new Section();
-                JSONObject sectionInfo = testPattern.getJSONObject(Integer.toString(j+1));
-                section.setSectionMarks(sectionInfo.getInt("sectionMarks"));
-                paperSetString+="\"sectionMarks\":\""+sectionInfo.getString("sectionMarks")+"\"";
-                section.setNumberOfQuestion(sectionInfo.getInt("numberOfQuestion"));
-                paperSetString+=",\"numberOfQuestion\":\""+sectionInfo.getString("numberOfQuestion")+"\"";
-                section.setQuestionType(sectionInfo.getString("questionType"));
-                paperSetString+=",\"questionType\":\""+sectionInfo.getString("questionType")+"\"";
-                section.setNumberOfQuestionAttempt(sectionInfo.getInt("numberOfQuestionAttempt"));
-                paperSetString+=",\"numberOfQuestionAttempt\":\""+sectionInfo.getString("numberOfQuestionAttempt")+"\"";
-                section.setQuestions(this.getQuestion(stmt,rs,query,courseId,testPattern,j+1));
-                paperSetString+=",\"questions\":[";
-                List<Item> items = section.getQuestions();
-                for(int k=0;k<items.size();k++)
-                {
-                    if(k!=0)
-                    {
-                        paperSetString+=",";
-                    }
-                    paperSetString+=Integer.toString(items.get(k).getItemId());
-                }
-                paperSetString+="]}";
-                paper.add(section);
-            }
+            paperSetString+=questionPaperSet.createQuestionPaper(stmt,rs,query,courseId,testPattern);
             paperSetString+="}";
-            questionPaperSet.getPapers().add(paper);
         }
         paperSetString+="}";
+        System.out.println(paperSetString);
         JSONObject paperSet = new JSONObject(paperSetString);
         query = "INSERT INTO questionpaperset(`courseId`,`numberOfQuestionPaper`,`numberOfSection`,`paperSet`,`totalMarks`,`isValidate`) VALUES ";
         query+="('"+Integer.toString(courseId)+"','"+Integer.toString(setCount)+"','"+Integer.toString(testPattern.getInt("numberOfSection"));
         query+="','"+paperSet.toString()+"','"+Integer.toString(testPattern.getInt("totalMarks"))+"','0')";
-        System.out.println(query);
         stmt.executeUpdate(query);
-        questionPaperSet.printQuestionPapers();
-
+        System.out.println("Question paper set generated successfully");
     }
 
     public QuestionPaperSet getQuestionpaperSet(Statement stmt,ResultSet rs,String query,int setId) throws SQLException{
         query = "SELECT * FROM questionpaperset WHERE setId = "+setId;
         rs = stmt.executeQuery(query);
-        QuestionPaperSet questionPaperSet =
+        QuestionPaperSet questionPaperSet = QuestionPaperSet.rsToObject(stmt,rs,query);
+        questionPaperSet.printQuestionPapers();
+        return questionPaperSet;
     }
 
 

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class Item {
+public abstract class Item {
     private int itemId;
     private int versionId;
     private int courseId;
@@ -20,21 +20,7 @@ public class Item {
     private int modifiedBy;
     private boolean isActive;
 
-    public Item() {
-    }
 
-    public Item(int itemId, int versionId, int courseId, String topicName, String category, JSONObject itemDescription, String deficultyLevel, int createdBy, int modifiedBy, boolean isActive) {
-        this.itemId = itemId;
-        this.versionId = versionId;
-        this.courseId = courseId;
-        this.topicName = topicName;
-        this.category = category;
-        this.itemDescription = itemDescription;
-        this.deficultyLevel = deficultyLevel;
-        this.createdBy = createdBy;
-        this.modifiedBy = modifiedBy;
-        this.isActive = isActive;
-    }
 
     public int getItemId() {
         return itemId;
@@ -121,7 +107,15 @@ public class Item {
         List<Item> questions = new ArrayList<>();
         try {
             while (rs.next()) {
-                Item item = new Item();
+                Item item;
+                if(rs.getString("itemCategory").equals("mcq"))
+                {
+                    item=new MCQItem();
+                }
+                else
+                {
+                    item=new SubjectiveItem();
+                }
                 item.setItemId(rs.getInt("itemId"));
                 item.setVersionId(rs.getInt("versionId"));
                 item.setCourseId(rs.getInt("courseId"));
@@ -143,20 +137,6 @@ public class Item {
         return questions;
     }
 
-    public void printItem()
-    {
-        if(this.getCategory().equals("subjective")){
-            System.out.println(" "+this.getItemDescription().getString("title"));
-        }
-        else if(this.getCategory().equals("mcq")){
-            System.out.println(" "+this.getItemDescription().getString("title"));
-            JSONObject options = this.getItemDescription().getJSONObject("options");
-            Iterator<String> keys = options.keys();
-            while (keys.hasNext()){
-                String key = keys.next();
-                System.out.println("("+key+") "+ options.getString(key));
-            }
-            System.out.println();
-        }
-    }
+    public abstract void printItem();
+
 }

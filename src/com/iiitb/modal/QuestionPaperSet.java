@@ -1,6 +1,7 @@
 package com.iiitb.modal;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
 import com.iiitb.modal.Section;
@@ -17,6 +18,7 @@ public class QuestionPaperSet {
     private List<List<Section>> papers;
 
     public QuestionPaperSet() {
+        this.papers = new ArrayList<List<Section>>();
     }
 
     public  QuestionPaperSet(int numberOfQuestionPaper, int numberOfSection,int totalMarks,int courseId){
@@ -97,15 +99,31 @@ public class QuestionPaperSet {
                 for(int i=1;i<=questionPaperSet.getNumberOfQuestionPaper();i++)
                 {
                     JSONObject paper = paperSet.getJSONObject(Integer.toString(i));
-                    JSONArray questions = paper.getJSONArray("questions");
-                    query =  "SELECT * FROM itembank where courseId = "+questionPaperSet.getCourseId() + " and itemId in (";
-                    for(int j=0;j<questions.length();j++)
+                    List<Section> sections = new ArrayList<>();
+                    for(int j=1;j<=questionPaperSet.getNumberOfSection();j++)
                     {
-                        if(j!=0)
-                            query+=",";
-                        query+=Integer.toString(questions.getInt(j));
+                        Section sec = new Section();
+                        JSONObject section = paper.getJSONObject(Integer.toString(j));
+                        sec.setSectionMarks(section.getInt("sectionMarks"));
+                        sec.setNumberOfQuestion(section.getInt("numberOfQuestion"));
+                        sec.setNumberOfQuestionAttempt(section.getInt("numberOfQuestionAttempt"));
+                        sec.setQuestionType(section.getString("questionType"));
+                        JSONArray questions = section.getJSONArray("questions");
+                        query =  "SELECT * FROM itembank where courseId = "+questionPaperSet.getCourseId() + " and itemId in (";
+                        for(int k=0;k<questions.length();k++)
+                        {
+                            if(k!=0)
+                                query+=",";
+                            query+=Integer.toString(questions.getInt(k));
+                        }
+                        query+=")";
+                        System.out.println(query);
+                        rs = stmt.executeQuery(query);
+                        sec.setQuestions(Item.rsToObject(rs));
+                        sections.add(sec);
                     }
-                    query+=")";
+                    questionPaperSet.getPapers().add(sections);
+
                 }
 
             }
@@ -116,6 +134,23 @@ public class QuestionPaperSet {
         return questionPaperSet;
     }
 
+    public String createQuestionPaper(Statement stmt, ResultSet rs, String query,int courseId ,JSONObject testPattern) throws SQLException {
+        String paperString="";
+        for(int j=0;j<testPattern.getInt("numberOfSection");j++)
+        {
+            if(j!=0)
+            {
+                paperString+=",";
+            }
+            paperString += "\""+Integer.toString(j+1)+"\":{";
+            Section section = new Section();
+            JSONObject sectionInfo = testPattern.getJSONObject(Integer.toString(j+1));
+            paperString += section.createSection(stmt,rs,query,courseId,sectionInfo);
+            paperString+="]}";
+        }
+
+        return paperString;
+    }
 
     public void printQuestionPapers(){
         System.out.println();
