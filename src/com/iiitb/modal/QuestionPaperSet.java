@@ -4,6 +4,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
+
+import com.iiitb.Iterator1;
 import com.iiitb.modal.Section;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -158,18 +160,19 @@ public class QuestionPaperSet {
         System.out.println("---------------------------------------------------------------------------------");
         for(int i=0;i<this.numberOfQuestionPaper;i++) {
             System.out.println("\t\t\t :Paper " + Integer.toString(i + 1) + ": \t\t\t Total Marks: " + this.totalMarks);
-            for (int j = 0; j < this.numberOfSection; j++) {
-                System.out.println("---------------------------------------------------------------------------------");
-                System.out.println("\t\t\t:Section " + Integer.toString(j + 1) + ":\t\t\t Section Marks: " + this.papers.get(i).get(j).getSectionMarks());
-                System.out.println();
-                int index = 1;
-                for (Item item : this.papers.get(i).get(j).getQuestions()) {
-                    System.out.print(index);
-                    item.printItem();
-                    index++;
-                }
-                System.out.println("---------------------------------------------------------------------------------");
-            }
+            Iterator1 iterator1 = new Iterator1();
+//            for (int j = 0; j < this.numberOfSection; j++) {
+//                System.out.println("---------------------------------------------------------------------------------");
+//                System.out.println("\t\t\t:Section " + Integer.toString(j + 1) + ":\t\t\t Section Marks: " + this.papers.get(i).get(j).getSectionMarks());
+//                System.out.println();
+//                int index = 1;
+//                for (Item item : this.papers.get(i).get(j).getQuestions()) {
+//                    System.out.print(index);
+//                    item.printItem();
+//                    index++;
+//                }
+//                System.out.println("---------------------------------------------------------------------------------");
+//            }
             System.out.println("---------------------------------------------------------------------------------");
         }
         System.out.println("---------------------------------------------------------------------------------");
