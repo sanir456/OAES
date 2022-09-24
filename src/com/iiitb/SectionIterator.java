@@ -8,6 +8,6 @@ import java.util.List;
 
 public abstract class SectionIterator {
     List<String> order;
-    abstract boolean hasNext();
-    abstract void getNext();
+    public abstract boolean hasNext();
+    public abstract void getNext();
 }

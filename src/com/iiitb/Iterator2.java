@@ -9,7 +9,7 @@ import java.util.List;
 public class Iterator2 extends SectionIterator {
     int currentPosition;
     List<Section> sections;
-    Iterator2(List<Section> sections )
+    public Iterator2(List<Section> sections )
     {
         this.currentPosition=0;
         this.sections =sections;
@@ -20,7 +20,7 @@ public class Iterator2 extends SectionIterator {
 
     }
 
-    boolean hasNext()
+    public boolean hasNext()
     {
         while(currentPosition< order.size())
         {
@@ -31,13 +31,14 @@ public class Iterator2 extends SectionIterator {
                     return true;
                 }
             }
+            currentPosition++;
         }
         return false;
     }
 
-    void getNext()
+    public void getNext()
     {
-        while(currentPosition< order.size())
+        if(currentPosition< order.size())
         {
             for(int j=0;j<this.sections.size();j++)
             {
@@ -55,6 +56,7 @@ public class Iterator2 extends SectionIterator {
                     System.out.println("---------------------------------------------------------------------------------");
                 }
             }
+            currentPosition++;
         }
 
     }
